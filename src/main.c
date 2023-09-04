@@ -1,5 +1,6 @@
 #include "ppm.h"
 #include <stdio.h>
+#include "vec.h"
 
 #define WIDTH 128
 #define HEIGHT 128
@@ -15,5 +16,9 @@ int main(void) {
       ppm_set(&img, j, i, (ppm_color){red * 255, green, blue * 255});
     }
   }
-  ppm_write(&img, "test.ppm");
+  ppm_write(&img, "./test.ppm");
+
+  vec3 v = { 2, 3, 6 };
+  v = vec3_normalised(v);
+  vec3_print(v);
 }

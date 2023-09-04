@@ -1,13 +1,15 @@
 #pragma once
 
 typedef union {
-    double *elements[3];
+    double elements[3];
     struct {
       double x;
       double y;
       double z;
-    }
+    };
 } vec3;
+
+void vec3_print(vec3 a);
 
 vec3 vec3_add(vec3 a, vec3 b);
 vec3 vec3_sub(vec3 a, vec3 b);

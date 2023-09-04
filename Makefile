@@ -11,9 +11,9 @@ WARNFLAGS = -Wall -Wextra
 DEFINES =
 CCFLAGS = -g $(WARNFLAGS) -I$(INCLUDE_DIR) $(DEFINES)
 LDFLAGS = -L$(LIB_DIR)
-LDLIBS =
+LDLIBS = -lm
 
-CFILES = $(SRC_DIR)/main.c $(SRC_DIR)/ppm.c
+CFILES = $(SRC_DIR)/main.c $(SRC_DIR)/ppm.c $(SRC_DIR)/vec.c
 
 OBJECTS = $(subst $(SRC_DIR), $(OBJ_DIR), $(CFILES:%.c=%.o))
 

@@ -1,7 +1,14 @@
 #include "vec.h"
 
+#include <math.h>
+#include <stdio.h>
+
+void vec3_print(vec3 a) {
+    printf("vector = < %f, %f, %f >\n", a.x, a.y, a.z);
+}
+
 vec3 vec3_add(vec3 a, vec3 b) {
-    return (vec3){a.x+b.x, a.y+b.y, a.z+b.z};
+    return (vec3){a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
 vec3 vec3_sub(vec3 a, vec3 b) {
@@ -33,7 +40,7 @@ double vec3_length(vec3 a) {
 }
 
 double vec3_length_squared(vec3 a) {
-    return a.x * a.x + a.y * a.y;
+    return a.x * a.x + a.y * a.y + a.z * a.z;
 }
 
 vec3 vec3_normalised(vec3 a) {
