@@ -3,11 +3,22 @@
 typedef union {
     double elements[3];
     struct {
-      double x;
-      double y;
-      double z;
+      union {
+        double x;
+        unsigned char r;
+      };
+      union {
+        double y;
+        unsigned char g;
+      };
+      union {
+        double z;
+        unsigned char b;
+      };
     };
 } vec3;
+
+typedef vec3 color_t;
 
 void vec3_print(vec3 a);
 
@@ -21,3 +32,5 @@ vec3 vec3_hadamard(vec3 a, vec3 b);
 double vec3_length(vec3 a);
 double vec3_length_squared(vec3 a);
 vec3 vec3_normalised(vec3 a);
+
+color_t col_create(unsigned char r, unsigned char g, unsigned char b);

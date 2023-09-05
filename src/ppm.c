@@ -14,7 +14,7 @@ PPM ppm_create(unsigned int width, unsigned int height) {
   return img;
 }
 
-void ppm_set(PPM *ppm, unsigned int x, unsigned int y, ppm_color color) {
+void ppm_set(PPM *ppm, unsigned int x, unsigned int y, color_t color) {
   if (!ppm) {
     ppm_abort(ppm, "Passed NULL to ppm_set()\n");
   }

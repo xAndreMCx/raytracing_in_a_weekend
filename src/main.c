@@ -13,7 +13,7 @@ int main(void) {
       float blue = (float)j / (HEIGHT - 1);
       int green = 0;
 
-      ppm_set(&img, j, i, (ppm_color){red * 255, green, blue * 255});
+      ppm_set(&img, j, i, col_create(red*255, green*255, blue*255));
     }
   }
   ppm_write(&img, "./test.ppm");

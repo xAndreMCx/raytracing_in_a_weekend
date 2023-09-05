@@ -46,3 +46,7 @@ double vec3_length_squared(vec3 a) {
 vec3 vec3_normalised(vec3 a) {
     return (vec3){a.x/vec3_length(a), a.y/vec3_length(a), a.z/vec3_length(a)};
 }
+
+color_t col_create(unsigned char r, unsigned char g, unsigned char b) {
+    return (color_t){.r=r, .g=g, .b=b};
+}
