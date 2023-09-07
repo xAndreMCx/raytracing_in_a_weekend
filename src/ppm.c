@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void ppm_abort(PPM *ppm, const char *fmt, ...);
+static void ppm_abort(PPM* ppm, const char* fmt, ...);
 
 PPM ppm_create(unsigned int width, unsigned int height) {
   PPM img;
@@ -14,7 +14,7 @@ PPM ppm_create(unsigned int width, unsigned int height) {
   return img;
 }
 
-void ppm_set(PPM *ppm, unsigned int x, unsigned int y, color_t color) {
+void ppm_set(PPM* ppm, unsigned int x, unsigned int y, color_t color) {
   if (!ppm) {
     ppm_abort(ppm, "Passed NULL to ppm_set()\n");
   }
@@ -24,17 +24,17 @@ void ppm_set(PPM *ppm, unsigned int x, unsigned int y, color_t color) {
   }
 
   int index = ((y * ppm->width) + x) * 3;
-  ppm->image[index + 0] = color.r;
-  ppm->image[index + 1] = color.g;
-  ppm->image[index + 2] = color.b;
+  ppm->image[index + 0] = color.r * 255;
+  ppm->image[index + 1] = color.g * 255;
+  ppm->image[index + 2] = color.b * 255;
 }
 
-void ppm_write(PPM *ppm, const char *path) {
+void ppm_write(PPM* ppm, const char* path) {
   if (!ppm) {
     ppm_abort(ppm, "Passed NULL to ppm_write()\n");
   }
 
-  FILE *fp;
+  FILE* fp;
   fp = fopen(path, "w");
 
   if (!fp) {
@@ -46,15 +46,14 @@ void ppm_write(PPM *ppm, const char *path) {
   for (unsigned int y = 0; y < ppm->height; y++) {
     for (unsigned int x = 0; x < ppm->width; x++) {
       int index = (y * (ppm->width) + x) * 3;
-      fprintf(fp, "%d %d %d\n", ppm->image[index], ppm->image[index + 1],
-              ppm->image[index + 2]);
+      fprintf(fp, "%d %d %d\n", ppm->image[index], ppm->image[index + 1], ppm->image[index + 2]);
     }
   }
 
   fclose(fp);
 }
 
-static void ppm_abort(PPM *ppm, const char *fmt, ...) {
+static void ppm_abort(PPM* ppm, const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
   vfprintf(stderr, fmt, args);
@@ -65,7 +64,7 @@ static void ppm_abort(PPM *ppm, const char *fmt, ...) {
   exit(EXIT_FAILURE);
 }
 
-void ppm_free(PPM *ppm) {
+void ppm_free(PPM* ppm) {
   if (ppm && ppm->image) {
     free(ppm->image);
   }

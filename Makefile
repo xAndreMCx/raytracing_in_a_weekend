@@ -1,4 +1,4 @@
-TARGET = $(BIN_DIR)/rasterizer
+TARGET = $(BIN_DIR)/raytracer
 
 INCLUDE_DIR = ./include
 LIB_DIR = ./lib

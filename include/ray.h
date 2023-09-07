@@ -4,6 +4,7 @@
 typedef struct {
   vec3 origin;
   vec3 direction;
-} ray;
+} ray_t;
 
-vec3 point_on_ray(ray r, double t);
+vec3 ray_point(ray_t r, double t);
+color_t ray_color(ray_t r);
