@@ -13,7 +13,7 @@ CCFLAGS = -g $(WARNFLAGS) -I$(INCLUDE_DIR) $(DEFINES)
 LDFLAGS = -L$(LIB_DIR)
 LDLIBS = -lm
 
-CFILES = $(SRC_DIR)/main.c $(SRC_DIR)/ppm.c $(SRC_DIR)/vec.c $(SRC_DIR)/ray.c
+CFILES = $(SRC_DIR)/main.c $(SRC_DIR)/ppm.c $(SRC_DIR)/vec.c $(SRC_DIR)/ray.c $(SRC_DIR)/hittable.c $(SRC_DIR)/sphere.c
 
 OBJECTS = $(subst $(SRC_DIR), $(OBJ_DIR), $(CFILES:%.c=%.o))
 
