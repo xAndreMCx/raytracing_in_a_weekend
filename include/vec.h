@@ -22,7 +22,6 @@ typedef vec3_t color_t;
 
 void vec3_print(vec3_t a);
 vec3_t vec3_create(double x, double y, double z);
-
 vec3_t vec3_add(vec3_t a, vec3_t b);
 vec3_t vec3_sub(vec3_t a, vec3_t b);
 vec3_t vec3_scale(vec3_t a, double t);
