@@ -24,6 +24,7 @@ void vec3_print(vec3_t a);
 vec3_t vec3_create(double x, double y, double z);
 vec3_t vec3_add(vec3_t a, vec3_t b);
 vec3_t vec3_sub(vec3_t a, vec3_t b);
+vec3_t vec3_negate(vec3_t a);
 vec3_t vec3_scale(vec3_t a, double t);
 vec3_t vec3_div(vec3_t a, double t);
 double vec3_dot(vec3_t a, vec3_t b);
