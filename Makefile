@@ -7,7 +7,7 @@ SRC_DIR = ./src
 OBJ_DIR = ./build/obj
 
 CC = gcc
-WARNFLAGS = -Wall -Wextra
+WARNFLAGS = -Wall -Wextra -Wpedantic
 DEFINES =
 CCFLAGS = -g $(WARNFLAGS) -I$(INCLUDE_DIR) $(DEFINES)
 LDFLAGS = -L$(LIB_DIR)

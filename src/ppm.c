@@ -6,6 +6,7 @@
 
 static void ppm_abort(PPM* ppm, const char* fmt, ...);
 
+// TODO: check for allc fail
 PPM ppm_create(unsigned int width, unsigned int height) {
   PPM img;
   img.width = width;

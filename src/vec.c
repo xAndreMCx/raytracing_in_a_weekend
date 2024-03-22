@@ -29,7 +29,7 @@ vec3_t vec3_scale(vec3_t a, double t) {
   vec3_t result = {.x = (a.x * t), .y = (a.y * t), .z = (a.z * t)};
   return result;
 }
-
+// TODO: check div by zero
 vec3_t vec3_div(vec3_t a, double t) { return vec3_scale(a, (1 / t)); }
 
 double vec3_dot(vec3_t a, vec3_t b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
@@ -48,6 +48,7 @@ double vec3_length(vec3_t a) { return sqrt(vec3_length_squared(a)); }
 
 double vec3_length_squared(vec3_t a) { return (a.x * a.x) + (a.y * a.y) + (a.z * a.z); }
 
+// TODO: check div by zero
 vec3_t vec3_normalised(vec3_t a) {
   vec3_t result = {.x = (a.x / vec3_length(a)), .y = (a.y / vec3_length(a)), .z = (a.z / vec3_length(a))};
   return result;
