@@ -11,6 +11,7 @@ typedef struct {
 interval_t interval_create(double min, double max);
 bool interval_contains(interval_t* interval, double x);
 bool interval_surrounds(interval_t* interval, double x);
+double interval_clamp(interval_t* interval, double x);
 
 #define EMPTY_INTERVAL ((interval_t){.min = INFINITY, .max = -INFINITY})
 #define UNIVERSE_INTERVAL ((interval_t){.min = -INFINITY, .max = INFINITY})

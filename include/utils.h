@@ -4,3 +4,5 @@
 
 #define DEG_TO_RAD(x) (x * (RT_PI / 180))
 #define RAD_TO_DEG(x) (x * (180 / RT_PI))
+
+double rand_double(double min, double max);
