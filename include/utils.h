@@ -6,3 +6,4 @@
 #define RAD_TO_DEG(x) (x * (180 / RT_PI))
 
 double rand_double(double min, double max);
+double linear_to_gamma(double linear);

@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "utils.h"
+
 void vec3_print(vec3_t a) { printf("vector = < %f, %f, %f >\n", a.x, a.y, a.z); }
 
 vec3_t vec3_create(double x, double y, double z) {
@@ -29,8 +31,14 @@ vec3_t vec3_scale(vec3_t a, double t) {
   vec3_t result = {.x = (a.x * t), .y = (a.y * t), .z = (a.z * t)};
   return result;
 }
-// TODO: check div by zero
-vec3_t vec3_div(vec3_t a, double t) { return vec3_scale(a, (1 / t)); }
+
+vec3_t vec3_div(vec3_t a, double t) {
+  if (t == 0) {
+    fprintf(stderr, "vec3_div div by 0 error.\n");
+    return vec3_create(0, 0, 0);
+  }
+  return vec3_scale(a, (1 / t));
+}
 
 double vec3_dot(vec3_t a, vec3_t b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 
@@ -48,9 +56,41 @@ double vec3_length(vec3_t a) { return sqrt(vec3_length_squared(a)); }
 
 double vec3_length_squared(vec3_t a) { return (a.x * a.x) + (a.y * a.y) + (a.z * a.z); }
 
-// TODO: check div by zero
 vec3_t vec3_normalised(vec3_t a) {
-  vec3_t result = {.x = (a.x / vec3_length(a)), .y = (a.y / vec3_length(a)), .z = (a.z / vec3_length(a))};
+  double length = vec3_length(a);
+  if (length == 0) {
+    fprintf(stderr, "vec3_normalised div by 0 error.\n");
+    return vec3_create(0, 0, 0);
+  }
+  vec3_t result = {.x = (a.x / length), .y = (a.y / length), .z = (a.z / length)};
+  return result;
+}
+
+vec3_t vec3_create_random(double min, double max) {
+  vec3_t result = {.x = rand_double(min, max), .y = rand_double(min, max), .z = rand_double(min, max)};
+  return result;
+}
+
+vec3_t vec3_create_random_unit() {
+  while (1) {
+    vec3_t p = vec3_create_random(-1, 1);
+    if (vec3_length_squared(p) < 1) {
+      return vec3_normalised(p);
+    }
+  }
+}
+
+vec3_t vec3_random_on_hemisphere(vec3_t normal) {
+  vec3_t on_unit_sphere = vec3_create_random_unit();
+  if (vec3_dot(on_unit_sphere, normal) > 0.0) {
+    return on_unit_sphere;
+  } else {
+    return vec3_negate(on_unit_sphere);
+  }
+}
+
+vec3_t vec3_map(vec3_t a, double (*fn)(double)) {
+  vec3_t result = {.x = fn(a.x), .y = fn(a.y), .z = fn(a.z)};
   return result;
 }
 

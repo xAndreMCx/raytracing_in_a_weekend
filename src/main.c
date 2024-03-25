@@ -22,20 +22,6 @@ int main(void) {
   hittable_list_add(&world, &main_sphere.base);
   hittable_list_add(&world, &earth_sphere.base);
 
-  // PPM img = ppm_create(width, height);
-  // for (unsigned int y = 0; y < height; y++) {
-  //   for (unsigned int x = 0; x < width; x++) {
-  //     vec3_t pixel_center = vec3_add(pixel_upper_left, vec3_add(vec3_scale(pixel_delta_u, x), vec3_scale(pixel_delta_v, y)));
-  //     vec3_t ray_direction = vec3_sub(pixel_center, camera_center);
-
-  //     ray_t r = {camera_center, ray_direction};
-
-  //     color_t ray_col = ray_color(&r, &world);
-
-  //     ppm_set(&img, x, y, ray_col);
-  //   }
-  // }
-  // ppm_write(&img, "./test.ppm");
   render(&camera, &world, "./test.ppm");
   printf("Done.\n");
 }

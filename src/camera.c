@@ -8,6 +8,7 @@
 camera_t camera_create(unsigned int image_width, double aspect_ratio) {
   camera_t result;
   result.samples_per_pixel = 100;
+  result.max_depth = 50;
 
   result.image_width = image_width;
   result.aspect_ratio = aspect_ratio;
@@ -38,14 +39,16 @@ void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
   PPM render_result = ppm_create(camera->image_width, camera->image_height);
   for (unsigned int y = 0; y < camera->image_height; y++) {
     for (unsigned int x = 0; x < camera->image_width; x++) {
-      // color_t ray_col = ray_color(&ray, world);
       color_t pixel_color = col_create(0, 0, 0);
       for (unsigned int sample = 0; sample < camera->samples_per_pixel; sample++) {
         ray_t ray = ray_get(camera, x, y);
-        pixel_color = vec3_add(pixel_color, ray_color(&ray, world));
+        pixel_color = vec3_add(pixel_color, ray_color(&ray, camera->max_depth, world));
       }
 
       pixel_color = vec3_scale(pixel_color, 1.0f / camera->samples_per_pixel);
+
+      // Gamma correction
+      pixel_color = vec3_map(pixel_color, linear_to_gamma);
 
       interval_t intensity = interval_create(0.0f, 1.0f);
       pixel_color.r = interval_clamp(&intensity, pixel_color.r);
@@ -58,16 +61,21 @@ void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
   ppm_write(&render_result, filepath);
 }
 
-color_t ray_color(ray_t* ray, hittable_list_t* world) {
+color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
   assert(ray);
   assert(world);
 
-  hit_record_t hit_record;
-  if (hittable_list_hit(world, ray, &(interval_t){.min = 0, .max = INFINITY}, &hit_record)) {
-    // scale the normal to be between 0 and 1
-    return vec3_scale(vec3_add(hit_record.normal, vec3_create(1, 1, 1)), 0.5);
+  if (depth <= 0) {
+    return col_create(0, 0, 0);
   }
 
+  hit_record_t hit_record;
+  if (hittable_list_hit(world, ray, &(interval_t){.min = 0.0001, .max = INFINITY}, &hit_record)) {
+    vec3_t direction = vec3_add(hit_record.normal, vec3_create_random_unit());
+    return vec3_scale(ray_color(&(ray_t){hit_record.point, direction}, depth - 1, world), 0.5f);
+  }
+
+  // Background
   vec3_t unit_vec = vec3_normalised(ray->direction);
   double a = (unit_vec.y + 1.00f) * 0.5f;
   return vec3_add(vec3_scale(col_create(1.0f, 1.0f, 1.0f), 1.00f - a), vec3_scale(col_create(0.5f, 0.7f, 1.0f), a));
