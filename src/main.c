@@ -23,5 +23,10 @@ int main(void) {
   hittable_list_add(&world, &earth_sphere.base);
 
   render(&camera, &world, "./test.ppm");
+
+  hittable_list_free(&world);
+
   printf("Done.\n");
+
+  return 0;
 }

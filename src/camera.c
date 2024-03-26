@@ -59,6 +59,7 @@ void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
     }
   }
   ppm_write(&render_result, filepath);
+  ppm_free(&render_result);
 }
 
 color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
