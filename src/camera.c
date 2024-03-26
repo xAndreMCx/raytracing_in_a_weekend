@@ -18,8 +18,8 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio) {
 
   result.center = vec3_create(0, 0, 0);
 
-  double focal_length = 1.0f;
-  double viewport_height = 2.0f;
+  double focal_length = 1.0;
+  double viewport_height = 2.0;
   double viewport_width = viewport_height * ((double)image_width / result.image_height);
 
   vec3_t viewport_u = vec3_create(viewport_width, 0, 0);
@@ -29,7 +29,7 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio) {
   result.pixel_delta_v = vec3_div(viewport_v, result.image_height);
 
   vec3_t viewport_upper_left = vec3_sub(vec3_sub(vec3_sub(result.center, vec3_create(0, 0, focal_length)), vec3_div(viewport_u, 2)), vec3_div(viewport_v, 2));
-  result.pixel_upper_left = vec3_add(viewport_upper_left, vec3_scale(vec3_add(result.pixel_delta_u, result.pixel_delta_v), 0.5f));
+  result.pixel_upper_left = vec3_add(viewport_upper_left, vec3_scale(vec3_add(result.pixel_delta_u, result.pixel_delta_v), 0.5));
 
 
   return result;
@@ -50,7 +50,7 @@ void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
       // Gamma correction
       pixel_color = vec3_map(pixel_color, linear_to_gamma);
 
-      interval_t intensity = interval_create(0.0f, 1.0f);
+      interval_t intensity = interval_create(0.0, 1.0);
       pixel_color.r = interval_clamp(&intensity, pixel_color.r);
       pixel_color.g = interval_clamp(&intensity, pixel_color.g);
       pixel_color.b = interval_clamp(&intensity, pixel_color.b);
@@ -72,20 +72,20 @@ color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
   hit_record_t hit_record;
   if (hittable_list_hit(world, ray, &(interval_t){.min = 0.0001, .max = INFINITY}, &hit_record)) {
     vec3_t direction = vec3_add(hit_record.normal, vec3_create_random_unit());
-    return vec3_scale(ray_color(&(ray_t){hit_record.point, direction}, depth - 1, world), 0.5f);
+    return vec3_scale(ray_color(&(ray_t){hit_record.point, direction}, depth - 1, world), 0.5);
   }
 
   // Background
   vec3_t unit_vec = vec3_normalised(ray->direction);
-  double a = (unit_vec.y + 1.00f) * 0.5f;
-  return vec3_add(vec3_scale(col_create(1.0f, 1.0f, 1.0f), 1.00f - a), vec3_scale(col_create(0.5f, 0.7f, 1.0f), a));
+  double a = (unit_vec.y + 1.00) * 0.5;
+  return vec3_add(vec3_scale(col_create(1.0, 1.0, 1.0), 1.00 - a), vec3_scale(col_create(0.5, 0.7, 1.0), a));
 }
 
 ray_t ray_get(camera_t* camera, unsigned int x, unsigned int y) {
   vec3_t pixel_center = vec3_add(camera->pixel_upper_left, vec3_add(vec3_scale(camera->pixel_delta_u, x), vec3_scale(camera->pixel_delta_v, y)));
 
-  double px = -0.5f + rand_double(0.0f, 1.0f);
-  double py = -0.5f + rand_double(0.0f, 1.0f);
+  double px = -0.5 + rand_double(0.0, 1.0);
+  double py = -0.5 + rand_double(0.0, 1.0);
   vec3_t rand_pixel = vec3_add(vec3_scale(camera->pixel_delta_u, px), vec3_scale(camera->pixel_delta_v, py));
   vec3_t pixel_sample = vec3_add(pixel_center, rand_pixel);
 
