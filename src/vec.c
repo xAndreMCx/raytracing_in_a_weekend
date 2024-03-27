@@ -94,6 +94,13 @@ vec3_t vec3_map(vec3_t a, double (*fn)(double)) {
   return result;
 }
 
+bool vec3_near_zero(vec3_t a) {
+  const double s = 1e-8;
+  return (fabs(a.x) < s) && (fabs(a.y) < s) && (fabs(a.z) < s);
+}
+
+vec3_t vec3_reflect(vec3_t v, vec3_t normal) { return vec3_sub(v, vec3_scale(normal, 2 * vec3_dot(v, normal))); }
+
 color_t col_create(double r, double g, double b) {
   vec3_t color = {.r = r, .g = g, .b = b};
   return color;

@@ -2,13 +2,14 @@
 
 #include <assert.h>
 
+#include "material.h"
 #include "ppm.h"
 #include "utils.h"
 
 camera_t camera_create(unsigned int image_width, double aspect_ratio) {
   camera_t result;
   result.samples_per_pixel = 100;
-  result.max_depth = 50;
+  result.max_depth = 50u;
 
   result.image_width = image_width;
   result.aspect_ratio = aspect_ratio;
@@ -72,8 +73,14 @@ color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
 
   hit_record_t hit_record;
   if (hittable_list_hit(world, ray, &(interval_t){.min = 0.0001, .max = INFINITY}, &hit_record)) {
-    vec3_t direction = vec3_add(hit_record.normal, vec3_create_random_unit());
-    return vec3_scale(ray_color(&(ray_t){hit_record.point, direction}, depth - 1, world), 0.5);
+    ray_t scattered;
+    color_t attenuation;
+    if (material_scatter((material_t*)hit_record.material, ray, &hit_record, &attenuation, &scattered)) {
+      return vec3_hadamard(attenuation, ray_color(&scattered, depth - 1, world));
+    }
+    return col_create(0, 0, 0);
+    // vec3_t direction = vec3_add(hit_record.normal, vec3_create_random_unit());
+    // return vec3_scale(ray_color(&(ray_t){hit_record.point, direction}, depth - 1, world), 0.5);
   }
 
   // Background

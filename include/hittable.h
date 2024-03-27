@@ -9,6 +9,7 @@
 typedef struct {
   vec3_t point;
   vec3_t normal;
+  void* material;
   double t;
   bool front_facing;
 } hit_record_t;
