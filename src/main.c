@@ -18,8 +18,8 @@ int main(void) {
 
   lambertian_t material_ground = lambertian_create(col_create(0.8, 0.8, 0.0));
   lambertian_t material_center = lambertian_create(col_create(0.7, 0.3, 0.3));
-  metal_t material_left = metal_create(col_create(0.8, 0.8, 0.8));
-  metal_t material_right = metal_create(col_create(0.8, 0.6, 0.2));
+  metal_t material_left = metal_create(col_create(0.8, 0.8, 0.8), 0.3);
+  metal_t material_right = metal_create(col_create(0.8, 0.6, 0.2), 1.0);
 
   // World
   hittable_list_t world = hittable_list_create(4);

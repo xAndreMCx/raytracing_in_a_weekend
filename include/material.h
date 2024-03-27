@@ -24,7 +24,8 @@ bool lambertian_scatter(lambertian_t* material, ray_t* ray, hit_record_t* hit_re
 typedef struct {
   material_t base;
   color_t albedo;
+  double fuzz;
 } metal_t;
 
-metal_t metal_create(color_t albedo);
+metal_t metal_create(color_t albedo, double fuzz);
 bool metal_scatter(metal_t* material, ray_t* ray, hit_record_t* hit_record, color_t* attenuation, ray_t* scattered_ray);

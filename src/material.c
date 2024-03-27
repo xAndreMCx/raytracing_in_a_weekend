@@ -25,11 +25,16 @@ bool lambertian_scatter(lambertian_t* material, ray_t* ray, hit_record_t* hit_re
   return true;
 }
 
-metal_t metal_create(color_t albedo) { return (metal_t){{MATERIAL_METAL}, albedo}; }
+metal_t metal_create(color_t albedo, double fuzz) {
+  fuzz = (fuzz < 1) ? fuzz : 1;
+  metal_t result = {{MATERIAL_METAL}, albedo, fuzz};
+  return result;
+}
 
 bool metal_scatter(metal_t* material, ray_t* ray, hit_record_t* hit_record, color_t* attenuation, ray_t* scattered_ray) {
   vec3_t reflected = vec3_reflect(vec3_normalised(ray->direction), hit_record->normal);
+  reflected = vec3_add(reflected, vec3_scale(vec3_create_random_unit(), material->fuzz));
   *scattered_ray = (ray_t){hit_record->point, reflected};
   *attenuation = material->albedo;
-  return true;
+  return vec3_dot(scattered_ray->direction, hit_record->normal) > 0;
 }
