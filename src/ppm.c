@@ -1,17 +1,19 @@
 #include "ppm.h"
 
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 static void ppm_abort(PPM* ppm, const char* fmt, ...);
 
-// TODO: check for allc fail
-PPM ppm_create(unsigned int width, unsigned int height) {
-  PPM img;
-  img.width = width;
-  img.height = height;
-  img.image = malloc(sizeof(*img.image) * width * height * 3);
+PPM* ppm_create(unsigned int width, unsigned int height) {
+  PPM* img = malloc(sizeof(PPM));
+  assert(img);
+  img->width = width;
+  img->height = height;
+  img->image = malloc(sizeof(*img->image) * width * height * 3);
+  assert(img->image);
   return img;
 }
 
@@ -66,7 +68,8 @@ static void ppm_abort(PPM* ppm, const char* fmt, ...) {
 }
 
 void ppm_free(PPM* ppm) {
-  if (ppm && ppm->image) {
+  if (ppm) {
     free(ppm->image);
+    free(ppm);
   }
 }

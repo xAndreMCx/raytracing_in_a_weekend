@@ -1,7 +1,10 @@
 #include "camera.h"
 
 #include <assert.h>
+#include <stdlib.h>
 
+#include "color.h"
+#include "material.h"
 #include "ppm.h"
 #include "utils.h"
 
@@ -36,7 +39,7 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio) {
 }
 
 void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
-  PPM render_result = ppm_create(camera->image_width, camera->image_height);
+  PPM* render_result = ppm_create(camera->image_width, camera->image_height);
   for (unsigned int y = 0; y < camera->image_height; y++) {
     for (unsigned int x = 0; x < camera->image_width; x++) {
       color_t pixel_color = col_create(0, 0, 0);
@@ -55,31 +58,11 @@ void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
       pixel_color.g = interval_clamp(&intensity, pixel_color.g);
       pixel_color.b = interval_clamp(&intensity, pixel_color.b);
 
-      ppm_set(&render_result, x, y, pixel_color);
+      ppm_set(render_result, x, y, pixel_color);
     }
   }
-  ppm_write(&render_result, filepath);
-  ppm_free(&render_result);
-}
-
-color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
-  assert(ray);
-  assert(world);
-
-  if (depth <= 0) {
-    return col_create(0, 0, 0);
-  }
-
-  hit_record_t hit_record;
-  if (hittable_list_hit(world, ray, &(interval_t){.min = 0.0001, .max = INFINITY}, &hit_record)) {
-    vec3_t direction = vec3_add(hit_record.normal, vec3_create_random_unit());
-    return vec3_scale(ray_color(&(ray_t){hit_record.point, direction}, depth - 1, world), 0.5);
-  }
-
-  // Background
-  vec3_t unit_vec = vec3_normalised(ray->direction);
-  double a = (unit_vec.y + 1.00) * 0.5;
-  return vec3_add(vec3_scale(col_create(1.0, 1.0, 1.0), 1.00 - a), vec3_scale(col_create(0.5, 0.7, 1.0), a));
+  ppm_write(render_result, filepath);
+  ppm_free(render_result);
 }
 
 ray_t ray_get(camera_t* camera, unsigned int x, unsigned int y) {

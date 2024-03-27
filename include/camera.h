@@ -17,5 +17,4 @@ typedef struct {
 
 camera_t camera_create(unsigned int image_width, double aspect_ratio);
 void render(camera_t* camera, hittable_list_t* world, const char* filepath);
-color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world);
 ray_t ray_get(camera_t* camera, unsigned int x, unsigned int y);

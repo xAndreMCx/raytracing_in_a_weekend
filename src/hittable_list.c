@@ -11,10 +11,13 @@ static void hittable_list_resize(hittable_list_t* list, unsigned int resize_ammo
   list->capacity += resize_ammount;
 }
 
-// TODO: find out if this should be refactored to be a void function and take in a pointer instead
-hittable_list_t hittable_list_create(unsigned int capacity) {
-  hittable_list_t result = {.hittables = calloc(capacity, sizeof(hittable_t*)), .length = 0, .capacity = capacity};
-  assert(result.hittables);
+hittable_list_t* hittable_list_create(unsigned int capacity) {
+  hittable_list_t* result = malloc(sizeof(hittable_list_t));
+  assert(result);
+  result->hittables = calloc(capacity, sizeof(hittable_t*));
+  assert(result->hittables);
+  result->length = 0;
+  result->capacity = capacity;
   return result;
 }
 
@@ -38,11 +41,8 @@ void hittable_list_clear(hittable_list_t* list) {
 }
 
 void hittable_list_free(hittable_list_t* list) {
-  assert(list);
-
   free(list->hittables);
-  list->capacity = 0;
-  list->length = 0;
+  free(list);
 }
 
 bool hittable_list_hit(hittable_list_t* list, ray_t* ray, interval_t* interval, hit_record_t* hit_record) {

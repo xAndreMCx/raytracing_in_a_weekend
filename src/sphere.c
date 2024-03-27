@@ -4,8 +4,8 @@
 
 #include "math.h"
 
-sphere_t sphere_create(vec3_t center, double radius) {
-  sphere_t result = {.base = {HITTABLE_SPHERE}, .center = center, .radius = radius};
+sphere_t sphere_create(vec3_t center, double radius, material_t* material) {
+  sphere_t result = {.base = {HITTABLE_SPHERE}, .center = center, .radius = radius, .material = material};
   return result;
 }
 

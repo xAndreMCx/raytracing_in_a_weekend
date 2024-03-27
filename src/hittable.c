@@ -2,7 +2,16 @@
 
 #include <assert.h>
 
+#include "material.h"
 #include "sphere.h"
+
+struct hit_record_t {
+  vec3_t point;
+  vec3_t normal;
+  material_t* material;
+  double t;
+  bool front_facing;
+};
 
 bool hittable_hit(hittable_t* hittable, ray_t* ray, interval_t* interval, hit_record_t* hit_record) {
   assert(hittable);

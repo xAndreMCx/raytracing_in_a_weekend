@@ -12,7 +12,7 @@ typedef struct {
   unsigned int capacity;
 } hittable_list_t;
 
-hittable_list_t hittable_list_create(unsigned int capacity);
+hittable_list_t* hittable_list_create(unsigned int capacity);
 void hittable_list_add(hittable_list_t* list, hittable_t* hittable);
 void hittable_list_clear(hittable_list_t* list);
 void hittable_list_free(hittable_list_t* list);
