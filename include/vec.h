@@ -36,7 +36,6 @@ double vec3_length_squared(vec3_t a);
 vec3_t vec3_normalised(vec3_t a);
 vec3_t vec3_create_random(double min, double max);
 vec3_t vec3_create_random_unit();
-vec3_t vec3_random_on_hemisphere(vec3_t normal);
 vec3_t vec3_map(vec3_t a, double (*fn)(double));
 bool vec3_near_zero(vec3_t a);
 vec3_t vec3_reflect(vec3_t v, vec3_t normal);

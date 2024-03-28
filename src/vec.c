@@ -80,15 +80,6 @@ vec3_t vec3_create_random_unit() {
   }
 }
 
-vec3_t vec3_random_on_hemisphere(vec3_t normal) {
-  vec3_t on_unit_sphere = vec3_create_random_unit();
-  if (vec3_dot(on_unit_sphere, normal) > 0.0) {
-    return on_unit_sphere;
-  } else {
-    return vec3_negate(on_unit_sphere);
-  }
-}
-
 vec3_t vec3_map(vec3_t a, double (*fn)(double)) {
   vec3_t result = {.x = fn(a.x), .y = fn(a.y), .z = fn(a.z)};
   return result;
