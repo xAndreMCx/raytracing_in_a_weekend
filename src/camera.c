@@ -7,30 +7,38 @@
 #include "ppm.h"
 #include "utils.h"
 
-camera_t camera_create(unsigned int image_width, double aspect_ratio) {
+camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up, double field_of_view) {
   camera_t result;
   result.samples_per_pixel = 100;
   result.max_depth = 50u;
 
   result.image_width = image_width;
   result.aspect_ratio = aspect_ratio;
+  result.center = look_from;
+  result.field_of_view = field_of_view;
 
   int img_height = image_width / aspect_ratio;
   result.image_height = (img_height < 1) ? 1 : img_height;
 
-  result.center = vec3_create(0, 0, 0);
 
-  double focal_length = 1.0;
-  double viewport_height = 2.0;
+  double focal_length = vec3_length(vec3_sub(look_from, look_at));
+  double theta = DEG_TO_RAD(result.field_of_view);
+  double h = tan(theta / 2);
+  double viewport_height = 2.0 * h * focal_length;
   double viewport_width = viewport_height * ((double)image_width / result.image_height);
 
-  vec3_t viewport_u = vec3_create(viewport_width, 0, 0);
-  vec3_t viewport_v = vec3_create(0, -viewport_height, 0);
+  result.w = vec3_normalised(vec3_sub(look_from, look_at));
+  result.u = vec3_normalised(vec3_cross(up, result.w));
+  result.v = vec3_cross(result.w, result.u);
+
+  vec3_t viewport_u = vec3_scale(result.u, viewport_width);
+  vec3_t viewport_v = vec3_scale(result.v, -viewport_height);
 
   result.pixel_delta_u = vec3_div(viewport_u, result.image_width);
   result.pixel_delta_v = vec3_div(viewport_v, result.image_height);
 
-  vec3_t viewport_upper_left = vec3_sub(vec3_sub(vec3_sub(result.center, vec3_create(0, 0, focal_length)), vec3_div(viewport_u, 2)), vec3_div(viewport_v, 2));
+  vec3_t viewport_upper_left =
+      vec3_sub(vec3_sub(vec3_sub(result.center, vec3_scale(result.w, focal_length)), vec3_div(viewport_u, 2)), vec3_div(viewport_v, 2));
   result.pixel_upper_left = vec3_add(viewport_upper_left, vec3_scale(vec3_add(result.pixel_delta_u, result.pixel_delta_v), 0.5));
 
 
