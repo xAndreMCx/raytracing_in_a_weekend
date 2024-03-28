@@ -36,10 +36,10 @@ bool sphere_hit(sphere_t* sphere, ray_t* ray, interval_t* interval, hit_record_t
     }
   }
 
-  hit_record->material = sphere->material;
 
   hit_record->t = root;
   hit_record->point = ray_point(ray, root);
+  hit_record->material = sphere->material;
   vec3_t outward_normal = vec3_div(vec3_sub(hit_record->point, sphere->center), sphere->radius);
   set_face_normal(hit_record, ray, &outward_normal);
   return true;

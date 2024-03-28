@@ -101,6 +101,13 @@ bool vec3_near_zero(vec3_t a) {
 
 vec3_t vec3_reflect(vec3_t v, vec3_t normal) { return vec3_sub(v, vec3_scale(normal, 2 * vec3_dot(v, normal))); }
 
+vec3_t vec3_refract(vec3_t uv, vec3_t normal, double etai_over_etat) {
+  double cos_theta = fmin(vec3_dot(vec3_negate(uv), normal), 1.0);
+  vec3_t r_perpendicular = vec3_scale(vec3_add(uv, vec3_scale(normal, cos_theta)), etai_over_etat);
+  vec3_t r_parallel = vec3_scale(normal, -sqrt(fabs(1.0 - vec3_length_squared(r_perpendicular))));
+  return vec3_add(r_perpendicular, r_parallel);
+}
+
 color_t col_create(double r, double g, double b) {
   vec3_t color = {.r = r, .g = g, .b = b};
   return color;

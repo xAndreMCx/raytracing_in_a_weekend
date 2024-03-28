@@ -1,6 +1,7 @@
 #include "camera.h"
 
 #include <assert.h>
+#include <stdio.h>
 
 #include "material.h"
 #include "ppm.h"
@@ -79,8 +80,6 @@ color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
       return vec3_hadamard(attenuation, ray_color(&scattered, depth - 1, world));
     }
     return col_create(0, 0, 0);
-    // vec3_t direction = vec3_add(hit_record.normal, vec3_create_random_unit());
-    // return vec3_scale(ray_color(&(ray_t){hit_record.point, direction}, depth - 1, world), 0.5);
   }
 
   // Background
