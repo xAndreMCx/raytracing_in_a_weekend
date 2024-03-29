@@ -9,10 +9,10 @@
 
 camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up, double field_of_view) {
   camera_t result;
-  result.samples_per_pixel = 100;
-  result.max_depth = 50u;
-  result.defocus_angle = 10;
-  result.focus_distance = 3.4;
+  result.samples_per_pixel = 500u;
+  result.max_depth = 100u;
+  result.defocus_angle = 0.6;
+  result.focus_distance = 10;
 
   result.image_width = image_width;
   result.aspect_ratio = aspect_ratio;
@@ -51,6 +51,7 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t loo
 void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
   PPM render_result = ppm_create(camera->image_width, camera->image_height);
   for (unsigned int y = 0; y < camera->image_height; y++) {
+    printf("\rScanlines remaining: %d\n", camera->image_height - y);
     for (unsigned int x = 0; x < camera->image_width; x++) {
       color_t pixel_color = col_create(0, 0, 0);
       for (unsigned int sample = 0; sample < camera->samples_per_pixel; sample++) {

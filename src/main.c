@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "camera.h"
 #include "hittable_list.h"
@@ -12,26 +13,61 @@
 int main(void) {
   // Camera
   double aspect_ratio = 16.0 / 9.0;
-  unsigned int width = 400u;
-  camera_t camera = camera_create(width, aspect_ratio, vec3_create(-2, 2, 1), vec3_create(0, 0, -1), vec3_create(0, 1, 0), 20.0);
+  unsigned int width = 1280u;
+  camera_t camera = camera_create(width, aspect_ratio, vec3_create(13, 2, 3), vec3_create(0, 0, 0), vec3_create(0, 1, 0), 20.0);
 
-  lambertian_t material_ground = lambertian_create(col_create(0.8, 0.8, 0.0));
-  lambertian_t material_center = lambertian_create(col_create(0.1, 0.2, 0.5));
-  dielectric_t material_left = dielectric_create(2.5);
-  metal_t material_right = metal_create(col_create(0.8, 0.6, 0.2), 0.0);
+  // World
+  hittable_list_t world = hittable_list_create(400);
 
-  sphere_t sphere_ground = sphere_create(vec3_create(0, -100.5, -1), 100, &material_ground.base);
-  sphere_t sphere_center = sphere_create(vec3_create(0, 0, -1), 0.5, &material_center.base);
-  sphere_t sphere_left = sphere_create(vec3_create(-1, 0, -1), 0.5, &material_left.base);
-  sphere_t sphere_inner = sphere_create(vec3_create(-1, 0, -1), -0.4, &material_left.base);
-  sphere_t sphere_right = sphere_create(vec3_create(1, 0, -1), 0.5, &material_right.base);
-
-  hittable_list_t world = hittable_list_create(4);
+  lambertian_t material_ground = lambertian_create(col_create(0.5, 0.5, 0.5));
+  sphere_t sphere_ground = sphere_create(vec3_create(0, -1000, 0), 1000, &material_ground.base);
   hittable_list_add(&world, &sphere_ground.base);
-  hittable_list_add(&world, &sphere_center.base);
-  hittable_list_add(&world, &sphere_left.base);
-  hittable_list_add(&world, &sphere_inner.base);
-  hittable_list_add(&world, &sphere_right.base);
+
+  for (int x = -11; x < 11; x++) {
+    for (int y = -11; y < 11; y++) {
+      double choose_mat = rand_double(0, 1);
+      vec3_t center = vec3_create(x + 0.9 * rand_double(0, 1), 0.2, y + 0.9 * rand_double(0, 1));
+
+      if (vec3_length(vec3_sub(center, vec3_create(4, 0.2, 0))) > 0.9) {
+        if (choose_mat < 0.8) {
+          // Diffuse
+          vec3_t albedo = vec3_hadamard(vec3_create_random(0, 1), vec3_create_random(0, 1));
+          lambertian_t* material = malloc(sizeof(lambertian_t));
+          *material = lambertian_create(albedo);
+          sphere_t* sphere = malloc(sizeof(sphere_t));
+          *sphere = sphere_create(center, 0.2, &material->base);
+          hittable_list_add(&world, &sphere->base);
+        } else if (choose_mat < 0.95) {
+          // Metal
+          vec3_t albedo = vec3_create_random(0.5, 1);
+          double fuzz = rand_double(0, 0.5);
+          metal_t* material = malloc(sizeof(metal_t));
+          *material = metal_create(albedo, fuzz);
+          sphere_t* sphere = malloc(sizeof(sphere_t));
+          *sphere = sphere_create(center, 0.2, &material->base);
+          hittable_list_add(&world, &sphere->base);
+        } else {
+          // Glass
+          dielectric_t material = dielectric_create(1.5);
+          sphere_t* sphere = malloc(sizeof(sphere_t));
+          *sphere = sphere_create(center, 0.2, &material.base);
+          hittable_list_add(&world, &sphere->base);
+        }
+      }
+    }
+  }
+
+  dielectric_t material1 = dielectric_create(1.5);
+  sphere_t sphere1 = sphere_create(vec3_create(0, 1, 0), 1.0, &material1.base);
+  hittable_list_add(&world, &sphere1.base);
+
+  lambertian_t material2 = lambertian_create(col_create(0.4, 0.2, 0.1));
+  sphere_t sphere2 = sphere_create(vec3_create(-4, 1, 0), 1.0, &material2.base);
+  hittable_list_add(&world, &sphere2.base);
+
+  metal_t material3 = metal_create(col_create(0.7, 0.6, 0.5), 0.0);
+  sphere_t sphere3 = sphere_create(vec3_create(4, 1, 0), 1.0, &material3.base);
+  hittable_list_add(&world, &sphere3.base);
 
   render(&camera, &world, "./test.ppm");
 
