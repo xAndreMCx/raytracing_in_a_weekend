@@ -17,9 +17,14 @@ typedef struct {
   vec3_t u;
   vec3_t v;
   vec3_t w;
+  vec3_t defocus_disk_u;
+  vec3_t defocus_disk_v;
+  double defocus_angle;
+  double focus_distance;
 } camera_t;
 
 camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up, double field_of_view);
 void render(camera_t* camera, hittable_list_t* world, const char* filepath);
 color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world);
 ray_t ray_get(camera_t* camera, unsigned int x, unsigned int y);
+vec3_t camera_defocus_disk_sample(camera_t* camera);

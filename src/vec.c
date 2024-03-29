@@ -99,6 +99,15 @@ vec3_t vec3_refract(vec3_t uv, vec3_t normal, double etai_over_etat) {
   return vec3_add(r_perpendicular, r_parallel);
 }
 
+vec3_t vec3_random_in_unit_disk() {
+  while (1) {
+    vec3_t p = vec3_create(rand_double(-1, 1), rand_double(-1, 1), 0);
+    if (vec3_length_squared(p) < 1) {
+      return p;
+    }
+  }
+}
+
 color_t col_create(double r, double g, double b) {
   vec3_t color = {.r = r, .g = g, .b = b};
   return color;

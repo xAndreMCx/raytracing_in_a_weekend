@@ -11,6 +11,8 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t loo
   camera_t result;
   result.samples_per_pixel = 100;
   result.max_depth = 50u;
+  result.defocus_angle = 10;
+  result.focus_distance = 3.4;
 
   result.image_width = image_width;
   result.aspect_ratio = aspect_ratio;
@@ -20,11 +22,9 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t loo
   int img_height = image_width / aspect_ratio;
   result.image_height = (img_height < 1) ? 1 : img_height;
 
-
-  double focal_length = vec3_length(vec3_sub(look_from, look_at));
   double theta = DEG_TO_RAD(result.field_of_view);
   double h = tan(theta / 2);
-  double viewport_height = 2.0 * h * focal_length;
+  double viewport_height = 2.0 * h * result.focus_distance;
   double viewport_width = viewport_height * ((double)image_width / result.image_height);
 
   result.w = vec3_normalised(vec3_sub(look_from, look_at));
@@ -38,9 +38,12 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t loo
   result.pixel_delta_v = vec3_div(viewport_v, result.image_height);
 
   vec3_t viewport_upper_left =
-      vec3_sub(vec3_sub(vec3_sub(result.center, vec3_scale(result.w, focal_length)), vec3_div(viewport_u, 2)), vec3_div(viewport_v, 2));
+      vec3_sub(vec3_sub(vec3_sub(result.center, vec3_scale(result.w, result.focus_distance)), vec3_div(viewport_u, 2)), vec3_div(viewport_v, 2));
   result.pixel_upper_left = vec3_add(viewport_upper_left, vec3_scale(vec3_add(result.pixel_delta_u, result.pixel_delta_v), 0.5));
 
+  double defocus_radius = result.focus_distance * tan(DEG_TO_RAD(result.defocus_angle / 2));
+  result.defocus_disk_u = vec3_scale(result.u, defocus_radius);
+  result.defocus_disk_v = vec3_scale(result.v, defocus_radius);
 
   return result;
 }
@@ -104,9 +107,16 @@ ray_t ray_get(camera_t* camera, unsigned int x, unsigned int y) {
   vec3_t rand_pixel = vec3_add(vec3_scale(camera->pixel_delta_u, px), vec3_scale(camera->pixel_delta_v, py));
   vec3_t pixel_sample = vec3_add(pixel_center, rand_pixel);
 
-  vec3_t ray_direction = vec3_sub(pixel_sample, camera->center);
+  vec3_t ray_origin = (camera->defocus_angle <= 0) ? camera->center : camera_defocus_disk_sample(camera);
+  vec3_t ray_direction = vec3_sub(pixel_sample, ray_origin);
 
-  ray_t ray = {camera->center, ray_direction};
+  ray_t ray = {ray_origin, ray_direction};
 
   return ray;
+}
+
+vec3_t camera_defocus_disk_sample(camera_t* camera) {
+  vec3_t p = vec3_random_in_unit_disk();
+  vec3_t result = vec3_add(camera->center, vec3_add(vec3_scale(camera->defocus_disk_u, p.x), vec3_scale(camera->defocus_disk_v, p.y)));
+  return result;
 }
