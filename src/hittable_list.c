@@ -11,7 +11,6 @@ static void hittable_list_resize(hittable_list_t* list, unsigned int resize_ammo
   list->capacity += resize_ammount;
 }
 
-// TODO: find out if this should be refactored to be a void function and take in a pointer instead
 hittable_list_t hittable_list_create(unsigned int capacity) {
   hittable_list_t result = {.hittables = calloc(capacity, sizeof(hittable_t*)), .length = 0, .capacity = capacity};
   assert(result.hittables);
