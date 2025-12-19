@@ -147,7 +147,7 @@ vec3_t vec3_create_random(double min, double max);
  *
  * @return A vector with random components in the unit sphere.
  */
-vec3_t vec3_create_random_unit();
+vec3_t vec3_create_random_unit(void);
 
 /**
  * @brief Applies a function to each component of the vector.
@@ -190,7 +190,7 @@ vec3_t vec3_refract(vec3_t uv, vec3_t normal, double etai_over_etat);
  *
  * @return A vector with random components in the unit disk.
  */
-vec3_t vec3_random_in_unit_disk();
+vec3_t vec3_random_in_unit_disk(void);
 
 /**
  * @brief Creates a color with the given components.
