@@ -1,35 +1,13 @@
-TARGET = $(BIN_DIR)/raytracer
+.PHONY: all setup run clean
 
-INCLUDE_DIR = ./include
-LIB_DIR = ./lib
-BIN_DIR = ./bin
-SRC_DIR = ./src
-OBJ_DIR = ./build/obj
+all:
+	@meson compile -C build
 
-CC = gcc
-WARNFLAGS = -Wall -Wextra -Wpedantic
-DEFINES =
-CCFLAGS = -g $(WARNFLAGS) -I$(INCLUDE_DIR) $(DEFINES)
-LDFLAGS = -L$(LIB_DIR)
-LDLIBS = -lm
+setup:
+	@meson setup build
 
-CFILES = $(wildcard $(SRC_DIR)/*.c)
-OBJECTS = $(subst $(SRC_DIR), $(OBJ_DIR), $(CFILES:%.c=%.o))
-
-.PHONY: all clean run
-
-all: $(TARGET)
-
-run: $(TARGET)
-	@$(TARGET)
-
-$(TARGET): $(OBJECTS)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(@D)
-	$(CC) $(CCFLAGS) -c -o $@ $<
+run: all
+	@./build/raytracer
 
 clean:
-	$(RM) -rf $(TARGET) $(OBJECTS)
+	@rm -rf build

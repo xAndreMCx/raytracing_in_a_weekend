@@ -1,0 +1,34 @@
+project(
+  'raytracer',
+  'c',
+  version: '0.1',
+  default_options: ['c_std=c11', 'warning_level=3'],
+)
+
+inc = include_directories('include')
+
+cc = meson.get_compiler('c')
+m_dep = cc.find_library('m', required: true)
+
+src_files = [
+  'src/main.c',
+  'src/camera.c',
+  'src/hittable.c',
+  'src/hittable_list.c',
+  'src/interval.c',
+  'src/material.c',
+  'src/ppm.c',
+  'src/ray.c',
+  'src/sphere.c',
+  'src/utils.c',
+  'src/vec.c',
+]
+
+executable(
+  'raytracer',
+  src_files,
+  include_directories: inc,
+  dependencies: m_dep,
+  link_args: ['-L' + meson.current_source_dir() + '/lib'],
+  install: true,
+)
