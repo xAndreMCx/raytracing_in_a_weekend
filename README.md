@@ -16,7 +16,10 @@ In this project, we explore the fundamentals of ray tracing and implement a basi
 
 To get started with this project, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/xAndreMCx/raytracing_in_a_weekend.git`
+1. Clone the repository: 
+```bash
+git clone https://github.com/xAndreMCx/raytracing_in_a_weekend.git
+```
 2. Setup the build directory:
 ```bash
 meson setup build
