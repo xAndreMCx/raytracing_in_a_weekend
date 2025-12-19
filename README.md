@@ -9,16 +9,28 @@ In this project, we explore the fundamentals of ray tracing and implement a basi
 
 ## Getting Started
 
+**Prerequisites**
+- Meson build system
+- Ninja
+- A C compiler
+
 To get started with this project, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/xAndreMCx/raytracing_in_a_weekend.git`
-2. Build the project:
+1. Clone the repository: 
 ```bash
-make
+git clone https://github.com/xAndreMCx/raytracing_in_a_weekend.git
 ```
-3. To run the executalble:
+2. Setup the build directory:
 ```bash
-make run
+meson setup build
+```
+3. Build the project:
+```bash
+meson compile -C build
+```
+4. To run the executable:
+```bash
+./build/raytracer
 ```
 
 ## Usage
