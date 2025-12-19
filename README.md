@@ -9,7 +9,7 @@ In this project, we explore the fundamentals of ray tracing and implement a basi
 
 ## Getting Started
 
-*Prerequisites*
+**Prerequisites**
 - Meson build system
 - Ninja
 - A C compiler
