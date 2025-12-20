@@ -2,15 +2,18 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "material.h"
 #include "ppm.h"
 #include "utils.h"
 
-camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up, double field_of_view) {
+camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up,
+                       double field_of_view) {
   camera_t result;
-  result.samples_per_pixel = 500u;
-  result.max_depth = 100u;
+  result.samples_per_pixel = 200u;
+  result.max_depth = 20u;
   result.defocus_angle = 0.6;
   result.focus_distance = 10;
 
@@ -38,8 +41,10 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t loo
   result.pixel_delta_v = vec3_div(viewport_v, result.image_height);
 
   vec3_t viewport_upper_left =
-      vec3_sub(vec3_sub(vec3_sub(result.center, vec3_scale(result.w, result.focus_distance)), vec3_div(viewport_u, 2)), vec3_div(viewport_v, 2));
-  result.pixel_upper_left = vec3_add(viewport_upper_left, vec3_scale(vec3_add(result.pixel_delta_u, result.pixel_delta_v), 0.5));
+      vec3_sub(vec3_sub(vec3_sub(result.center, vec3_scale(result.w, result.focus_distance)), vec3_div(viewport_u, 2)),
+               vec3_div(viewport_v, 2));
+  result.pixel_upper_left =
+      vec3_add(viewport_upper_left, vec3_scale(vec3_add(result.pixel_delta_u, result.pixel_delta_v), 0.5));
 
   double defocus_radius = result.focus_distance * tan(DEG_TO_RAD(result.defocus_angle / 2));
   result.defocus_disk_u = vec3_scale(result.u, defocus_radius);
@@ -48,32 +53,82 @@ camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t loo
   return result;
 }
 
+void* render_pixel_worker(void* arg) {
+  thread_data_t* data = (thread_data_t*)arg;
+  unsigned int width = data->camera->image_width;
+
+  unsigned int my_seed = (unsigned int)time(NULL) ^ (unsigned int)(uintptr_t)pthread_self();
+  seed_thread_rng(my_seed);
+
+  seed_thread_rng((unsigned int)(uintptr_t)pthread_self());
+
+  while (1) {
+    unsigned int index = atomic_fetch_add(data->next_pixel_index, 1);
+
+    if (index >= data->total_pixels)
+      break;
+
+    unsigned int x = index % width;
+    unsigned int y = index / width;
+
+    color_t pixel_color = col_create(0, 0, 0);
+    for (unsigned int sample = 0; sample < data->camera->samples_per_pixel; sample++) {
+      ray_t ray = ray_get(data->camera, x, y);
+      pixel_color = vec3_add(pixel_color, ray_color(&ray, data->camera->max_depth, data->world));
+    }
+
+    pixel_color = vec3_scale(pixel_color, 1.0f / data->camera->samples_per_pixel);
+    pixel_color = vec3_map(pixel_color, linear_to_gamma);
+
+    // // Gamma correction
+    // pixel_color = vec3_map(pixel_color, linear_to_gamma);
+    //
+    // interval_t intensity = interval_create(0.0, 1.0);
+    // pixel_color.r = interval_clamp(&intensity, pixel_color.r);
+    // pixel_color.g = interval_clamp(&intensity, pixel_color.g);
+    // pixel_color.b = interval_clamp(&intensity, pixel_color.b);
+
+    ppm_set(data->render_result, x, y, pixel_color);
+  }
+  return NULL;
+}
+
 void render(camera_t* camera, hittable_list_t* world, const char* filepath) {
   PPM render_result = ppm_create(camera->image_width, camera->image_height);
-  for (unsigned int y = 0; y < camera->image_height; y++) {
-    printf("\rScanlines remaining: %d\n", camera->image_height - y);
-    for (unsigned int x = 0; x < camera->image_width; x++) {
-      color_t pixel_color = col_create(0, 0, 0);
-      for (unsigned int sample = 0; sample < camera->samples_per_pixel; sample++) {
-        ray_t ray = ray_get(camera, x, y);
-        pixel_color = vec3_add(pixel_color, ray_color(&ray, camera->max_depth, world));
+  atomic_uint next_pixel_index = 0;
+  unsigned int total_pixels = camera->image_width * camera->image_height;
+
+  thread_data_t* pool_data = malloc(sizeof(thread_data_t));
+  pool_data->camera = camera;
+  pool_data->world = world;
+  pool_data->render_result = &render_result;
+  pool_data->next_pixel_index = &next_pixel_index;
+  pool_data->total_pixels = total_pixels;
+
+  const int num_threads = 8;
+  pthread_t threads[num_threads];
+
+  for (int i = 0; i < num_threads; i++) {
+    int result = pthread_create(&threads[i], NULL, render_pixel_worker, pool_data);
+
+    if (result != 0) {
+      fprintf(stderr, "Error: pthread_create failed with error code %d\n", result);
+
+      for (int j = 0; j < i; j++) {
+        pthread_join(threads[j], NULL);
       }
-
-      pixel_color = vec3_scale(pixel_color, 1.0f / camera->samples_per_pixel);
-
-      // Gamma correction
-      pixel_color = vec3_map(pixel_color, linear_to_gamma);
-
-      interval_t intensity = interval_create(0.0, 1.0);
-      pixel_color.r = interval_clamp(&intensity, pixel_color.r);
-      pixel_color.g = interval_clamp(&intensity, pixel_color.g);
-      pixel_color.b = interval_clamp(&intensity, pixel_color.b);
-
-      ppm_set(&render_result, x, y, pixel_color);
+      free(pool_data);
+      exit(1);
     }
   }
+
+  for (int i = 0; i < num_threads; i++) {
+    pthread_join(threads[i], NULL);
+  }
+
   ppm_write(&render_result, filepath);
   ppm_free(&render_result);
+  free(pool_data);
 }
 
 color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
@@ -101,7 +156,8 @@ color_t ray_color(ray_t* ray, unsigned int depth, hittable_list_t* world) {
 }
 
 ray_t ray_get(camera_t* camera, unsigned int x, unsigned int y) {
-  vec3_t pixel_center = vec3_add(camera->pixel_upper_left, vec3_add(vec3_scale(camera->pixel_delta_u, x), vec3_scale(camera->pixel_delta_v, y)));
+  vec3_t pixel_center = vec3_add(camera->pixel_upper_left,
+                                 vec3_add(vec3_scale(camera->pixel_delta_u, x), vec3_scale(camera->pixel_delta_v, y)));
 
   double px = -0.5 + rand_double(0.0, 1.0);
   double py = -0.5 + rand_double(0.0, 1.0);
@@ -118,6 +174,7 @@ ray_t ray_get(camera_t* camera, unsigned int x, unsigned int y) {
 
 vec3_t camera_defocus_disk_sample(camera_t* camera) {
   vec3_t p = vec3_random_in_unit_disk();
-  vec3_t result = vec3_add(camera->center, vec3_add(vec3_scale(camera->defocus_disk_u, p.x), vec3_scale(camera->defocus_disk_v, p.y)));
+  vec3_t result = vec3_add(camera->center,
+                           vec3_add(vec3_scale(camera->defocus_disk_u, p.x), vec3_scale(camera->defocus_disk_v, p.y)));
   return result;
 }

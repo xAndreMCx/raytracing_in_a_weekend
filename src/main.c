@@ -1,7 +1,7 @@
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "camera.h"
 #include "hittable_list.h"
@@ -11,10 +11,12 @@
 #include "vec.h"
 
 int main(void) {
+  seed_thread_rng((unsigned int)time(NULL));
   // Camera
   double aspect_ratio = 16.0 / 9.0;
-  unsigned int width = 1280u;
-  camera_t camera = camera_create(width, aspect_ratio, vec3_create(13, 2, 3), vec3_create(0, 0, 0), vec3_create(0, 1, 0), 20.0);
+  unsigned int width = 240u;
+  camera_t camera =
+      camera_create(width, aspect_ratio, vec3_create(13, 2, 3), vec3_create(0, 0, 0), vec3_create(0, 1, 0), 20.0);
 
   // World
   hittable_list_t world = hittable_list_create(400);
@@ -69,6 +71,7 @@ int main(void) {
   sphere_t sphere3 = sphere_create(vec3_create(4, 1, 0), 1.0, &material3.base);
   hittable_list_add(&world, &sphere3.base);
 
+  printf("Starting render.\n");
   render(&camera, &world, "./test.ppm");
 
   hittable_list_free(&world);

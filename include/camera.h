@@ -1,6 +1,8 @@
 #pragma once
+#include <stdatomic.h>
 
 #include "hittable_list.h"
+#include "ppm.h"
 #include "ray.h"
 
 /**
@@ -28,6 +30,18 @@ typedef struct {
 } camera_t;
 
 /**
+ * @struct thread_data_t
+ * @brief Payload structure passed to each pthread.
+ */
+typedef struct {
+  camera_t* camera;
+  hittable_list_t* world;
+  PPM* render_result;
+  atomic_uint* next_pixel_index;
+  unsigned int total_pixels;
+} thread_data_t;
+
+/**
  * @brief Creates a camera with the specified parameters.
  *
  * @param image_width Width of the image.
@@ -38,7 +52,16 @@ typedef struct {
  * @param field_of_view Field of view of the camera.
  * @return A camera with the specified parameters.
  */
-camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up, double field_of_view);
+camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up,
+                       double field_of_view);
+
+/**
+ * @brief The worker function executed by each pthread.
+ *
+ * @param arg Pointer to thread_data_t.
+ * @return void* Required by pthread_create.
+ */
+void* render_pixel_worker(void* arg);
 
 /**
  * @brief Renders the scene and saves the image to a file.
