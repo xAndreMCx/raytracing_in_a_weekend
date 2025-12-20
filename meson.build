@@ -1,7 +1,7 @@
 project(
   'raytracer',
   'c',
-  version: '0.1',
+  version: '1.0.0',
   default_options: ['c_std=c11', 'warning_level=3'],
 )
 
@@ -9,6 +9,7 @@ inc = include_directories('include')
 
 cc = meson.get_compiler('c')
 m_dep = cc.find_library('m', required: true)
+thread_dep = dependency('threads')
 
 src_files = [
   'src/main.c',
@@ -28,7 +29,7 @@ executable(
   'raytracer',
   src_files,
   include_directories: inc,
-  dependencies: m_dep,
+  dependencies: [m_dep, thread_dep],
   link_args: ['-L' + meson.current_source_dir() + '/lib'],
   install: true,
 )
