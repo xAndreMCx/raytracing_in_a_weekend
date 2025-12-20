@@ -12,8 +12,8 @@
 camera_t camera_create(unsigned int image_width, double aspect_ratio, vec3_t look_from, vec3_t look_at, vec3_t up,
                        double field_of_view) {
   camera_t result;
-  result.samples_per_pixel = 200u;
-  result.max_depth = 20u;
+  result.samples_per_pixel = 500u;
+  result.max_depth = 100u;
   result.defocus_angle = 0.6;
   result.focus_distance = 10;
 

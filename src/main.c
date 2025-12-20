@@ -14,7 +14,7 @@ int main(void) {
   seed_thread_rng((unsigned int)time(NULL));
   // Camera
   double aspect_ratio = 16.0 / 9.0;
-  unsigned int width = 240u;
+  unsigned int width = 1280u;
   camera_t camera =
       camera_create(width, aspect_ratio, vec3_create(13, 2, 3), vec3_create(0, 0, 0), vec3_create(0, 1, 0), 20.0);
 
